@@ -2,78 +2,76 @@
 
 Discord向けAIボットプラットフォーム - マイクロサービスベースのスケーラブルなボット管理システム
 
-## System Architecture 📊
+## システム概要
 
-### 全体構成
+Discord AI Bot Platformは、AIを活用したボットをDiscord上で効率的に運用・管理するためのプラットフォームです。マイクロサービスアーキテクチャを採用し、柔軟なスケーリングと機能拡張を可能にしています。
+
+## システムアーキテクチャ 📊
+
+### コアサービス構成
 
 ```mermaid
 graph TD
-    A[Discord Bot Management] --> B[Message Management]
-    A --> C[Dify]
-    C --> B
-    C --> D[AI Bot Profile Management]
-```
-
-### 処理フロー詳細
-
-#### 1. 返信フロー
-
-```mermaid
-sequenceDiagram
-    participant Discord
-    participant discord_bot_management
-    participant message_management
-    participant dify
-    
-    Discord->>discord_bot_management: メッセージ受信
-    discord_bot_management->>message_management: メッセージ保存
-    
-    alt メンションあり
-        discord_bot_management->>dify: メッセージ情報送信
-        dify-->>discord_bot_management: 返信内容
-        discord_bot_management->>Discord: 返信送信
-    end
-```
-
-#### 2. 返信内容生成フロー
-
-```mermaid
-sequenceDiagram
-    participant dify
-    participant message_management
-    participant ai_bot_profile_management
-    participant LLM
-    
-    note over dify: メッセージ情報受信（チャンネル・メッセージ内容）
-    dify->>message_management: 過去メッセージ取得
-    message_management-->>dify: 会話履歴
-    dify->>ai_bot_profile_management: ボット設定取得
-    ai_bot_profile_management-->>dify: 設定情報
-    dify->>LLM: メッセージ生成要求
-    LLM-->>dify: 生成結果
-```
-
-#### 3. 性格設定フロー
-
-```mermaid
-sequenceDiagram
-    participant Discord
-    participant discord_bot_management
-    participant dify
-    participant ai_bot_profile_management
-    
-    Discord->>discord_bot_management: 設定メッセージ
-    discord_bot_management->>dify: メッセージ送信
-    
-    dify->>dify: 設定メッセージ判定
-    
-    alt 設定メッセージの場合
-        dify->>ai_bot_profile_management: 設定保存
-        ai_bot_profile_management-->>dify: 更新結果
+    subgraph "External Services"
+        Discord[Discord]
+        LLM[Language Model]
     end
     
-    dify-->>discord_bot_management: 処理結果
-    discord_bot_management->>Discord: 結果送信
+    subgraph "Core Services"
+        DBM[Discord Bot Management]
+        MM[Message Management]
+        DIFY[Dify]
+        BPM[Bot Profile Management]
+    end
+    
+    Discord <--> DBM
+    DBM <--> MM
+    DBM <--> DIFY
+    DIFY <--> MM
+    DIFY <--> BPM
+    DIFY <--> LLM
+
+    class Discord,LLM external
+    class DBM,MM,DIFY,BPM core
+```
+
+### 統合処理フロー
+
+```mermaid
+sequenceDiagram
+    participant D as Discord
+    participant DBM as Discord Bot Management
+    participant MM as Message Management
+    participant DIFY as Dify
+    participant BPM as Bot Profile Management
+    participant LLM as Language Model
+
+    %% メッセージ受信フロー
+    D->>DBM: 1. メッセージ受信
+    DBM->>MM: 2. メッセージ保存
+    
+    alt メンション/設定メッセージの場合
+        DBM->>DIFY: 3. メッセージ処理依頼
+        
+        %% 会話履歴取得
+        DIFY->>MM: 4. 会話履歴取得
+        MM-->>DIFY: 5. 会話履歴
+
+        %% ボット設定取得
+        DIFY->>BPM: 6. ボット設定取得
+        BPM-->>DIFY: 7. 設定情報
+
+        alt 設定メッセージの場合
+            DIFY->>BPM: 8a. 設定更新
+            BPM-->>DIFY: 9a. 更新完了
+        else 通常メッセージの場合
+            DIFY->>LLM: 8b. 返信生成要求
+            LLM-->>DIFY: 9b. 生成結果
+        end
+
+        DIFY-->>DBM: 10. 処理結果
+        DBM->>D: 11. Discord返信
+    end
 ```
 
 ### Core Services
