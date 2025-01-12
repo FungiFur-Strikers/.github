@@ -78,8 +78,8 @@ sequenceDiagram
 
 | Service | Description | Status |
 |---------|-------------|---------|
-| [discord_bot_management](https://github.com/FungiFur-Strikers/discord-bot-service) | Discord統合とメッセージルーティング | [![Status](https://img.shields.io/badge/status-active-success)]() |
-| [ai_bot_profile_management](https://github.com/FungiFur-Strikers/bot-profile-manager) | ボットのパーソナリティと設定管理 | [![Status](https://img.shields.io/badge/status-active-success)]() |
-| [message_management](https://github.com/FungiFur-Strikers/discord-message-service) | 会話履歴とメッセージストレージ | [![Status](https://img.shields.io/badge/status-active-success)]() |
+| [discord-bot-service](https://github.com/FungiFur-Strikers/discord-bot-service) | Discord統合とメッセージルーティング | [![Status](https://img.shields.io/badge/status-active-success)]() |
+| [bot-profile-manager](https://github.com/FungiFur-Strikers/bot-profile-manager) | ボットのパーソナリティと設定管理 | [![Status](https://img.shields.io/badge/status-active-success)]() |
+| [message-service](https://github.com/FungiFur-Strikers/message-service) | 会話履歴とメッセージストレージ | [![Status](https://img.shields.io/badge/status-active-success)]() |
 
 ---
